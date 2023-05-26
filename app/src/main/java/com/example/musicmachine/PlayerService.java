@@ -29,6 +29,13 @@ public class PlayerService extends Service {
 
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        mPlayer.setOnCompletionListener( v->{
+            stopSelf();
+        });
+        return Service.START_NOT_STICKY;
+    }
 
     @Override
     public boolean onUnbind(Intent intent) {
@@ -38,7 +45,7 @@ public class PlayerService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "onDestroy: ");
+        Log.d(TAG, "onDestroy: started");
         mPlayer.release();
     }
 
