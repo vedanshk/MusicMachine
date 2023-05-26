@@ -3,8 +3,8 @@ package com.example.musicmachine;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.os.Binder;
 import android.os.IBinder;
+import android.os.Messenger;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -13,12 +13,14 @@ public class PlayerService extends Service {
 
     private static final String TAG = "PlayerService";
     private MediaPlayer mPlayer;
-    private final IBinder mBinder = new LocalBinder();
+
+    public final Messenger mMessenger = new Messenger(new PlayerHandler(this));
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind: started");
-        return mBinder;
+        return mMessenger.getBinder();
     }
 
     @Override
@@ -49,11 +51,7 @@ public class PlayerService extends Service {
         mPlayer.release();
     }
 
-    public class LocalBinder extends Binder{
-        public PlayerService getServices(){
-            return PlayerService.this;
-        }
-    }
+
 
     public boolean isPlaying(){
         return mPlayer.isPlaying();

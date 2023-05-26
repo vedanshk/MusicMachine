@@ -9,25 +9,36 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+
+
     private static final String TAG = "MainActivity";
     public static final String KEY_SONG = "KEY_SONG";
     private boolean Bound = false;
-    private PlayerService mPlayerService;
+    private Messenger mServiceMessager;
+    private Messenger mActivityMessager  = new Messenger(new ActivityHandler(this));
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
             Bound =  true;
-            PlayerService.LocalBinder localBinder = (PlayerService.LocalBinder) binder;
-
-            mPlayerService =  localBinder.getServices();
-            if(mPlayerService.isPlaying()){
-                playButton.setText("Pause");
+            mServiceMessager = new Messenger(binder);
+            Message message = Message.obtain();
+            message.arg1 = 2;
+            message.arg2 = 1;
+            message.replyTo = mActivityMessager;
+            try {
+                mServiceMessager.send(message);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
             }
+
+
         }
 
         @Override
@@ -47,21 +58,25 @@ public class MainActivity extends AppCompatActivity {
         playButton =  findViewById(R.id.play);
 
         playButton.setOnClickListener(v->{
+
             if(Bound){
-
-                if(mPlayerService.isPlaying()){
-                    playButton.setText("Play");
-                    mPlayerService.pause();
-                }else{
-                    Intent intent = new Intent(MainActivity.this , PlayerService.class);
-                    startService(intent);
-                    playButton.setText("Pause");
-                    mPlayerService.play();
+                Intent intent = new Intent(MainActivity.this , PlayerService.class);
+                startService(intent);
+                Message message = Message.obtain();
+                message.arg1 = 2;
+                message.replyTo = mActivityMessager;
+                try {
+                    mServiceMessager.send(message);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
                 }
-
             }
 
         });
+    }
+
+    public void changePlayText(String text){
+        playButton.setText(text);
     }
 
     @Override
