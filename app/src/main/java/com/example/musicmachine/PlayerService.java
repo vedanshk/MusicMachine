@@ -1,5 +1,6 @@
 package com.example.musicmachine;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -23,6 +24,8 @@ public class PlayerService extends Service {
         return mMessenger.getBinder();
     }
 
+
+
     @Override
     public void onCreate() {
         Log.d(TAG, "onCreate: started");
@@ -33,8 +36,10 @@ public class PlayerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         mPlayer.setOnCompletionListener( v->{
             stopSelf();
+
         });
         return Service.START_NOT_STICKY;
     }
