@@ -1,6 +1,8 @@
 package com.example.musicmachine.adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.musicmachine.DetailsActivity;
+import com.example.musicmachine.MainActivity;
 import com.example.musicmachine.R;
 import com.example.musicmachine.models.Song;
 
@@ -43,7 +47,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
         return mSongs.length;
     }
 
-    public static class SongViewHolder extends RecyclerView.ViewHolder{
+    public  class SongViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private final ImageView imageView;
         private final TextView textView;
@@ -64,6 +68,14 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
             else {
                 imageView.setVisibility(View.INVISIBLE);
             }
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(mContext , DetailsActivity.class);
+            intent.putExtra(MainActivity.EXTRA_SONG, mSongs[getAdapterPosition()]);
+            intent.putExtra(MainActivity.EXTRA_LIST_POSITION, getAdapterPosition());
+            ((Activity)mContext).startActivityForResult(intent, MainActivity.REQUEST_FAVORITE);
         }
     }
 }

@@ -28,7 +28,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     public static final String KEY_SONG = "KEY_SONG";
     public static final String SONG_TITLE = "SONG_TITLE";
-    private RecyclerView recyclerView;
+    public static final String EXTRA_TITLE = "EXTRA_TITLE";
+    public static final String EXTRA_SONG = "EXTRA_SONG";
+    public static final int REQUEST_FAVORITE = 0;
+    public static final String EXTRA_FAVORITE = "EXTRA_FAVORITE";
+    public static final String EXTRA_LIST_POSITION = "EXTRA_LIST_POSITION";
     private boolean Bound = false;
     private Messenger mServiceMessager;
     private final Messenger mActivityMessager  = new Messenger(new ActivityHandler(this));
@@ -57,17 +61,19 @@ public class MainActivity extends AppCompatActivity {
         }
     };
     Button playButton , btnDownload;
+    private PlaylistAdapter playlistAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recyclerView =  findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
 
         playButton =  findViewById(R.id.play);
 
-        PlaylistAdapter adapter = new PlaylistAdapter(Playlist.songs, this);
-        recyclerView.setAdapter(adapter);
+        playlistAdapter = new PlaylistAdapter(Playlist.songs, this);
+        recyclerView.setAdapter(playlistAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         playButton.setOnClickListener(v->{
@@ -121,12 +127,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == 101) {
             assert data != null;
-            Toast.makeText(this, data.getBooleanExtra(DetailsActivity.FAVORITE_SONG , false) + "", Toast.LENGTH_SHORT).show();
+            boolean result = data.getBooleanExtra(EXTRA_FAVORITE, false);
+            Log.i(TAG, "Is favorite? " + result);
+            int position = data.getIntExtra(EXTRA_LIST_POSITION, 0);
+            Playlist.songs[position].setIsFavorite(result);
+            playlistAdapter.notifyItemChanged(position);
         }
     }
 }
