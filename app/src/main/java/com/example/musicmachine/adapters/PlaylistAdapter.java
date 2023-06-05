@@ -75,6 +75,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
             Intent intent = new Intent(mContext , DetailsActivity.class);
             intent.putExtra(MainActivity.EXTRA_SONG, mSongs[getAdapterPosition()]);
             intent.putExtra(MainActivity.EXTRA_LIST_POSITION, getAdapterPosition());
+            mContext.startActivity(intent);
             ((Activity)mContext).startActivityForResult(intent, MainActivity.REQUEST_FAVORITE);
         }
     }
